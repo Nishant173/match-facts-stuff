@@ -1,0 +1,2 @@
+class InvalidMatchFactsError(Exception):
+    pass
