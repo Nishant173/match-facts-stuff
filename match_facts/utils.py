@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict, List, NamedTuple, Union
 import datetime
 import random
 import numpy as np
@@ -157,6 +157,25 @@ def get_unique_players(df_match_facts: pd.DataFrame) -> List[str]:
         objs=[df_mf['HomePlayer'], df_mf['AwayPlayer']]
     ).dropna().sort_values(ascending=True).unique().tolist()
     return all_players
+
+
+def get_unique_player_and_team_combos(df_match_facts: pd.DataFrame) -> List[NamedTuple]:
+    """Returns list of named tuples, wherein each NamedTuple has the attributes 'Player' and 'Team'"""
+    df_mf = df_match_facts.copy(deep=True)
+    df_home = df_mf.loc[:, ['HomePlayer', 'HomeTeam']]
+    df_away = df_mf.loc[:, ['AwayPlayer', 'AwayTeam']]
+    df_home.columns = list(
+        map(lambda column: str(column).replace('Home', ''), df_home.columns.tolist())
+    )
+    df_away.columns = list(
+        map(lambda column: str(column).replace('Away', ''), df_away.columns.tolist())
+    )
+    df_player_team_combos = pd.concat(objs=[df_home, df_away]).drop_duplicates().reset_index(drop=True)
+    df_player_team_combos.sort_values(by=['Player', 'Team'], ascending=[True, True], ignore_index=True, inplace=True)
+    list_of_named_tuples = list(
+        df_player_team_combos.itertuples(index=False, name='PlayerTeamCombo')
+    )
+    return list_of_named_tuples
 
 
 def add_ranking_column(
