@@ -10,16 +10,16 @@ class StatValueFetcher:
     """
     Computes stat values by team, given the MatchFacts DataFrame.
     Exposes a dictionary/dataframe having all the stat values by team, in ascending order of timestamp.
+    
+    Stats returned: ['goals', 'possession', 'shots', 'shots_on_target', 'shot_accuracy', 'pass_accuracy',
+    'tackles', 'fouls', 'goals_conceded', 'possession_conceded', 'shots_conceded',
+    'shots_on_target_conceded', 'shot_accuracy_conceded', 'pass_accuracy_conceded',
+    'tackles_suffered', 'fouls_suffered']
     """
 
     def __init__(self, df_match_facts: pd.DataFrame) -> None:
         self.df_match_facts = df_match_facts.copy(deep=True)
         self.__validate_columns()
-        self.stat_options = [
-            'goals', 'possession', 'shots', 'shots_on_target', 'shot_accuracy', 'pass_accuracy', 'tackles', 'fouls',
-            'goals_conceded', 'possession_conceded', 'shots_conceded', 'shots_on_target_conceded',
-            'shot_accuracy_conceded', 'pass_accuracy_conceded', 'tackles_suffered', 'fouls_suffered',
-        ]
         self.goals = {}
         self.possession = {}
         self.shots = {}
@@ -36,6 +36,7 @@ class StatValueFetcher:
         self.pass_accuracy_conceded = {}
         self.tackles_suffered = {}
         self.fouls_suffered = {}
+        self.compute_all_stat_values()
         return None
     
     def __validate_columns(self) -> None:
@@ -120,7 +121,6 @@ class StatValueFetcher:
         Returns dictionary having keys = stat name, and values = dictionary of stat values by team.
         The stat values will be in ascending order of timestamp.
         """
-        self.compute_all_stat_values()
         dict_obj = {
             'goals': self.goals,
             'possession': self.possession,
