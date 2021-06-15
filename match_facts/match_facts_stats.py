@@ -7,6 +7,8 @@ import utils
 
 def get_avg_possession(data: pd.DataFrame, team: str) -> Union[int, float]:
     """Gets average possession of given team (Expects DataFrame having MatchFacts data)"""
+    if data.empty:
+        return np.nan
     home_possession_values = data[(data['HomeTeam'] == team)]['HomePossession'].tolist()
     away_possession_values = data[(data['AwayTeam'] == team)]['AwayPossession'].tolist()
     avg_possession = np.mean(home_possession_values + away_possession_values)
@@ -15,6 +17,8 @@ def get_avg_possession(data: pd.DataFrame, team: str) -> Union[int, float]:
 
 def get_avg_shots(data: pd.DataFrame, team: str) -> Union[int, float]:
     """Gets average shots of given team (Expects DataFrame having MatchFacts data)"""
+    if data.empty:
+        return np.nan
     home_shots_values = data[(data['HomeTeam'] == team)]['HomeShots'].tolist()
     away_shots_values = data[(data['AwayTeam'] == team)]['AwayShots'].tolist()
     avg_shots = np.mean(home_shots_values + away_shots_values)
@@ -23,6 +27,8 @@ def get_avg_shots(data: pd.DataFrame, team: str) -> Union[int, float]:
 
 def get_avg_shots_on_target(data: pd.DataFrame, team: str) -> Union[int, float]:
     """Gets average shots on target of given team (Expects DataFrame having MatchFacts data)"""
+    if data.empty:
+        return np.nan
     home_sot = data[(data['HomeTeam'] == team)]['HomeShotsOnTarget'].tolist()
     away_sot = data[(data['AwayTeam'] == team)]['AwayShotsOnTarget'].tolist()
     avg_shots_on_target = np.mean(home_sot + away_sot)
@@ -31,6 +37,8 @@ def get_avg_shots_on_target(data: pd.DataFrame, team: str) -> Union[int, float]:
 
 def get_avg_shot_accuracy(data: pd.DataFrame, team: str) -> Union[int, float]:
     """Gets average shot accuracy of given team (Expects DataFrame having MatchFacts data)"""
+    if data.empty:
+        return np.nan
     home_shot_accuracy = data[(data['HomeTeam'] == team)]['HomeShotAccuracy'].tolist()
     away_shot_accuracy = data[(data['AwayTeam'] == team)]['AwayShotAccuracy'].tolist()
     avg_shot_accuracy = np.mean(home_shot_accuracy + away_shot_accuracy)
@@ -39,6 +47,8 @@ def get_avg_shot_accuracy(data: pd.DataFrame, team: str) -> Union[int, float]:
 
 def get_avg_pass_accuracy(data: pd.DataFrame, team: str) -> Union[int, float]:
     """Gets average pass accuracy of given team (Expects DataFrame having MatchFacts data)"""
+    if data.empty:
+        return np.nan
     home_pass_accuracy = data[(data['HomeTeam'] == team)]['HomePassAccuracy'].tolist()
     away_pass_accuracy = data[(data['AwayTeam'] == team)]['AwayPassAccuracy'].tolist()
     avg_pass_accuracy = np.mean(home_pass_accuracy + away_pass_accuracy)
@@ -47,6 +57,8 @@ def get_avg_pass_accuracy(data: pd.DataFrame, team: str) -> Union[int, float]:
 
 def get_avg_tackles(data: pd.DataFrame, team: str) -> Union[int, float]:
     """Gets average tackles of given team (Expects DataFrame having MatchFacts data)"""
+    if data.empty:
+        return np.nan
     home_tackles = data[(data['HomeTeam'] == team)]['HomeTackles'].tolist()
     away_tackles = data[(data['AwayTeam'] == team)]['AwayTackles'].tolist()
     avg_tackles = np.mean(home_tackles + away_tackles)
@@ -55,6 +67,8 @@ def get_avg_tackles(data: pd.DataFrame, team: str) -> Union[int, float]:
 
 def get_avg_fouls(data: pd.DataFrame, team: str) -> Union[int, float]:
     """Gets average fouls of given team (Expects DataFrame having MatchFacts data)"""
+    if data.empty:
+        return np.nan
     home_fouls = data[(data['HomeTeam'] == team)]['HomeFouls'].tolist()
     away_fouls = data[(data['AwayTeam'] == team)]['AwayFouls'].tolist()
     avg_fouls = np.mean(home_fouls + away_fouls)
@@ -62,7 +76,7 @@ def get_avg_fouls(data: pd.DataFrame, team: str) -> Union[int, float]:
 
 
 def __drop_result_based_columns(df_mf_stats: pd.DataFrame) -> pd.DataFrame:
-    """Takes in DataFrame having MatchFactsStats data, and drops the result based columns from the available stats"""
+    """Takes in DataFrame having MatchFactsStats data, and drops the result based columns from the available columns"""
     df = df_mf_stats.copy(deep=True)
     columns = df.columns.tolist()
     columns_to_drop = list(
@@ -75,7 +89,7 @@ def __drop_result_based_columns(df_mf_stats: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def get_match_facts_stats(data: pd.DataFrame, ignore_result_based_stats: bool) -> pd.DataFrame:
+def get_match_facts_stats_by_team(data: pd.DataFrame) -> pd.DataFrame:
     """Expects MatchFacts DataFrame. Returns DataFrame of MatchFacts related stats by team"""
     df_mf = data.copy(deep=True)
     df_mf_stats = pd.DataFrame()
@@ -181,6 +195,22 @@ def get_match_facts_stats(data: pd.DataFrame, ignore_result_based_stats: bool) -
         df_mf_stats = pd.concat(objs=[df_mf_stats, df_temp], ignore_index=True, sort=False)
     df_mf_stats = df_mf_stats.round(2)
     df_mf_stats.sort_values(by=['Team'], ascending=[True], ignore_index=True, inplace=True)
-    if ignore_result_based_stats:
-        df_mf_stats = __drop_result_based_columns(df_mf_stats=df_mf_stats)
     return df_mf_stats
+
+
+def get_match_facts_stats_by_player(data: pd.DataFrame) -> pd.DataFrame:
+    """Expects MatchFacts DataFrame. Returns DataFrame of MatchFacts related stats by player"""
+    df_mf = data.copy(deep=True)
+    df_mf['HomeTeam'] = df_mf['HomePlayer'].tolist()
+    df_mf['AwayTeam'] = df_mf['AwayPlayer'].tolist()
+    df_mf_stats_by_player = get_match_facts_stats_by_team(data=df_mf)
+    return df_mf_stats_by_player
+
+
+def get_match_facts_stats_by_player_and_team_combo(data: pd.DataFrame) -> pd.DataFrame:
+    """Expects MatchFacts DataFrame. Returns DataFrame of MatchFacts related stats by (player, team) combo"""
+    df_mf = data.copy(deep=True)
+    df_mf['HomeTeam'] = df_mf['HomePlayer'] + '|' + df_mf['HomeTeam']
+    df_mf['AwayTeam'] = df_mf['AwayPlayer'] + '|' + df_mf['AwayTeam']
+    df_mf_stats_by_player_and_team_combo = get_match_facts_stats_by_team(data=df_mf)
+    return df_mf_stats_by_player_and_team_combo

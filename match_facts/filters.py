@@ -16,6 +16,18 @@ def filter_by_player(df_match_facts: pd.DataFrame, player: str) -> pd.DataFrame:
     return df_by_player
 
 
+def filter_by_player_and_team_combo(
+        df_match_facts: pd.DataFrame,
+        player: str,
+        team: str,
+    ) -> pd.DataFrame:
+    df_mf = df_match_facts.copy(deep=True)
+    combo_is_home = (df_mf['HomePlayer'] == player) & (df_mf['HomeTeam'] == team)
+    combo_is_away = (df_mf['AwayPlayer'] == player) & (df_mf['AwayTeam'] == team)
+    df_by_player_and_team_combo = df_mf[combo_is_home | combo_is_away]
+    return df_by_player_and_team_combo
+
+
 def filter_by_team_result(
         data: pd.DataFrame,
         team: str,

@@ -133,7 +133,7 @@ def get_results_string(data: pd.DataFrame) -> Dict[str, str]:
     return dictionary_results
 
 
-def get_scoreline_stats(data: pd.DataFrame) -> pd.DataFrame:
+def get_scoreline_stats_by_team(data: pd.DataFrame) -> pd.DataFrame:
     """Expects MatchFacts DataFrame. Returns DataFrame of scoreline related stats by team"""
     df_mf = data.copy(deep=True)
     df_scoreline_stats = pd.DataFrame()
@@ -178,3 +178,21 @@ def get_scoreline_stats(data: pd.DataFrame) -> pd.DataFrame:
     )
     df_scoreline_stats.drop(labels=['PPG', 'GDPG'], axis=1, inplace=True)
     return df_scoreline_stats
+
+
+def get_scoreline_stats_by_player(data: pd.DataFrame) -> pd.DataFrame:
+    """Expects MatchFacts DataFrame. Returns DataFrame of scoreline related stats by player"""
+    df_mf = data.copy(deep=True)
+    df_mf['HomeTeam'] = df_mf['HomePlayer'].tolist()
+    df_mf['AwayTeam'] = df_mf['AwayPlayer'].tolist()
+    df_scoreline_stats_by_player = get_scoreline_stats_by_team(data=df_mf)
+    return df_scoreline_stats_by_player
+
+
+def get_scoreline_stats_by_player_and_team_combo(data: pd.DataFrame) -> pd.DataFrame:
+    """Expects MatchFacts DataFrame. Returns DataFrame of scoreline related stats by (player, team) combo"""
+    df_mf = data.copy(deep=True)
+    df_mf['HomeTeam'] = df_mf['HomePlayer'] + '|' + df_mf['HomeTeam']
+    df_mf['AwayTeam'] = df_mf['AwayPlayer'] + '|' + df_mf['AwayTeam']
+    df_scoreline_stats_by_player_and_team_combo = get_scoreline_stats_by_team(data=df_mf)
+    return df_scoreline_stats_by_player_and_team_combo
