@@ -8,13 +8,13 @@ from match_facts_stats import (
     get_match_facts_stats_by_player_and_team_combo,
     get_match_facts_stats_by_team,
 )
-from metric_fetcher import StatValueFetcher
 import plotter
 from scoreline_stats import (
     get_scoreline_stats_by_player,
     get_scoreline_stats_by_player_and_team_combo,
     get_scoreline_stats_by_team,
 )
+from stat_value_fetcher import StatValueFetcher
 from validators import validate_match_facts
 
 
@@ -67,8 +67,11 @@ def execute_pipeline(src_filepath: str) -> None:
     )
 
     # DataViz
-    svf = StatValueFetcher(df_match_facts=df_match_facts)
-    dataframes_by_stat = svf.as_dataframes()
+    svf_teams = StatValueFetcher(
+        df_match_facts=df_match_facts,
+        participant_type='teams',
+    )
+    dataframes_by_stat = svf_teams.as_dataframes()
     plotter.plot_match_facts_distributions(
         dataframes_by_stat=dataframes_by_stat,
         folder_to_store=FOLDER_STRUCTURE['viz-distributions'],
