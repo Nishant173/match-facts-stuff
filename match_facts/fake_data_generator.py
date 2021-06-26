@@ -1,4 +1,3 @@
-from typing import Dict
 import random
 import numpy as np
 import pandas as pd
@@ -22,7 +21,7 @@ PLAYER_NAMES = [
 ]
 
 
-def generate_fake_match_facts(num_records: int) -> Dict[str, int]:
+def generate_fake_match_facts(num_records: int) -> pd.DataFrame:
     df_fmf = pd.DataFrame()
     home_players = [random.choice(PLAYER_NAMES) for _ in range(num_records)]
     away_players = [
