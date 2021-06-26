@@ -18,7 +18,7 @@ class StatValueFetcher:
         
         Parameters:
             - df_match_facts (DataFrame): DataFrame having MatchFacts
-            - participant_type (str): Type of participant. Options: ['teams', 'players', 'team_and_player_combos']
+            - participant_type (str): Type of participant. Options: ['team', 'player', 'team_and_player_combo']
         
         Stats retrieved: ['goals', 'possession', 'shots', 'shots_on_target', 'shot_accuracy', 'pass_accuracy',
         'tackles', 'fouls', 'goals_conceded', 'possession_conceded', 'shots_conceded',
@@ -51,7 +51,7 @@ class StatValueFetcher:
         self.pass_accuracy_conceded = {}
         self.tackles_suffered = {}
         self.fouls_suffered = {}
-        self.__compute_all_stat_values()
+        self.__fetch_all_stat_values()
         return None
     
     def __validate_columns(self) -> None:
@@ -74,7 +74,7 @@ class StatValueFetcher:
         Validates `participant_type`, and raises an Exception if the validation fails.
         Returns None if the validation is successful.
         """
-        valid_participant_types = ['teams', 'players', 'team_and_player_combos']
+        valid_participant_types = ['team', 'player', 'team_and_player_combo']
         if self.participant_type not in valid_participant_types:
             raise ValueError(
                 f"Expected `participant_type` to be in {valid_participant_types}, but got '{self.participant_type}'"
@@ -91,13 +91,13 @@ class StatValueFetcher:
         on the `participant_type`
         """
         df_mf = df_match_facts.copy(deep=True)
-        if participant_type == 'teams':
+        if participant_type == 'team':
             df_mf['HomeParticipant'] = df_mf['HomeTeam'].tolist()
             df_mf['AwayParticipant'] = df_mf['AwayTeam'].tolist()
-        elif participant_type == 'players':
+        elif participant_type == 'player':
             df_mf['HomeParticipant'] = df_mf['HomePlayer'].tolist()
             df_mf['AwayParticipant'] = df_mf['AwayPlayer'].tolist()
-        elif participant_type == 'team_and_player_combos':
+        elif participant_type == 'team_and_player_combo':
             df_mf['HomeParticipant'] = df_mf['HomePlayer'] + '|' + df_mf['HomeTeam']
             df_mf['AwayParticipant'] = df_mf['AwayPlayer'] + '|' + df_mf['AwayTeam']
         return df_mf
@@ -109,7 +109,7 @@ class StatValueFetcher:
         ).dropna().sort_values(ascending=True).unique().tolist()
         return all_participants
     
-    def __compute_all_stat_values(self) -> None:
+    def __fetch_all_stat_values(self) -> None:
         """Fetches all stat values and stores them in the objects initialized in the constructor"""
         df_mf = self.df_match_facts.copy(deep=True)
         df_mf.sort_values(by='Timestamp', ascending=True, ignore_index=True, inplace=True)

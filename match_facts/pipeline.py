@@ -69,7 +69,7 @@ def execute_pipeline(src_filepath: str) -> None:
     # DataViz
     svf_teams = StatValueFetcher(
         df_match_facts=df_match_facts,
-        participant_type='teams',
+        participant_type='team',
     )
     dataframes_by_stat = svf_teams.as_dataframes()
     plotter.plot_match_facts_distributions(
